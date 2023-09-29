@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Substances</title>
+  <!-- Include Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>User Substances</h1>
+  
+  <!-- Input field to enter user email -->
+  <label for="emailInput">Enter Email:</label>
+  <input type="text" id="emailInput">
+  
+  <!-- Button to fetch substances -->
+  <button onclick="fetchSubstances()">Fetch Substances</button>
+  
+  <!-- Container for checkboxes -->
+  <div id="substanceCheckboxes">
+    <!-- Checkboxes will be added here dynamically -->
+  </div>
+
+  <!-- Button to fetch and display data for selected substances -->
+  <button onclick="fetchAndDisplayData()">Fetch and Display Data</button>
+  
+  <!-- Container for displaying data -->
+  <div id="dataDisplay">
+    <!-- Data will be displayed here -->
+  </div>
+
+  <script>
+    // Initialize Firebase
+    const firebaseConfig = {
+  apiKey: "AIzaSyDN1InuxhUFEfuzDsss2pP3sWCFpQhVM2Y",
+  authDomain: "rebmunbackward.firebaseapp.com",
+  projectId: "rebmunbackward",
+  storageBucket: "rebmunbackward.appspot.com",
+  messagingSenderId: "932660000198",
+  appId: "1:932660000198:web:e151c63fb5fcb4e3cf2ec7",
+  measurementId: "G-HEYT95HEWZ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.firestore();
+
+    // Store selected substances
+    let selectedSubstances = [];
+
+    // Function to fetch substances from Firebase data
+    function fetchSubstances() {
+      // Get the user's email from the input field
+      const userEmail = document.getElementById("emailInput").value;
+
+      // Check if the email is empty
+      if (!userEmail) {
+        alert("Please enter an email.");
+        return;
+      }
+
+      // Fetch user data to check if the email exists in the database
+      db.collection("games")
+        .where("email", "==", userEmail)
+        .get()
+        .then((querySnapshot) => {
+          if (querySnapshot.empty) {
+            // The user's email was not found in the database
+            alert("Email not found in the database. Please enter a valid email.");
+          } else {
+            // The user's email was found, so fetch and display substances
+            const substances = new Set(); // Use a set to store unique substances
+            querySnapshot.forEach((doc) => {
+              const substance = doc.data().substance;
+              substances.add(substance);
+            });
+
+            // Create checkboxes for each substance
+            const substanceCheckboxes = document.getElementById("substanceCheckboxes");
+            substanceCheckboxes.innerHTML = ""; // Clear previous checkboxes
+            substances.forEach((substance) => {
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.id = substance;
+              checkbox.name = "substanceCheckbox";
+              checkbox.value = substance;
+              checkbox.checked = true; // Initially checked
+              const label = document.createElement("label");
+              label.htmlFor = substance;
+              label.textContent = substance;
+              substanceCheckboxes.appendChild(checkbox);
+              substanceCheckboxes.appendChild(label);
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching substances: ", error);
+        });
+    }
+
+    // Function to fetch data for selected substances
+    function fetchAndDisplayData() {
+      // Get the selected substances
+      selectedSubstances = Array.from(document.querySelectorAll('input[name="substanceCheckbox"]:checked'))
+        .map((checkbox) => checkbox.value);
+
+      // Get the user's email from the input field
+      const userEmail = document.getElementById("emailInput").value;
+
+      // Check if the email is empty
+      if (!userEmail) {
+        alert("Please enter an email.");
+        return;
+      }
+
+      // Fetch data for selected substances
+      const promises = selectedSubstances.map((substance) =>
+        fetchScoresForSubstance(userEmail, substance)
+      );
+
+      Promise.all(promises)
+        .then((scoresData) => {
+          // Process and display the data as needed
+          displayData(scoresData);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data: ", error);
+        });
+    }
+
+    // Function to fetch scores for a specific substance
+    function fetchScoresForSubstance(userEmail, substance) {
+      return db
+        .collection("games")
+        .where("email", "==", userEmail)
+        .where("substance", "==", substance)
+        .get()
+        .then((querySnapshot) => {
+          const scores = [];
+          querySnapshot.forEach((doc) => {
+            // Assuming your Firestore document structure has a 'score' field
+            const score = doc.data().score;
+            scores.push(score);
+          });
+          return { substance, scores };
+        });
+    }
+
+    // Function to display data
+    function displayData(scoresData) {
+      const dataDisplay = document.getElementById("dataDisplay");
+
+      scoresData.forEach((data) => {
+        const substanceHeading = document.createElement("h2");
+        substanceHeading.textContent = data.substance;
+        dataDisplay.appendChild(substanceHeading);
+
+        const scoresList = document.createElement("ul");
+        data.scores.forEach((score) => {
+          const scoreItem = document.createElement("li");
+          scoreItem.textContent = score;
+          scoresList.appendChild(scoreItem);
+        });
+        dataDisplay.appendChild(scoresList);
+      });
+    }
+  </script>
+</body>
+</html>
