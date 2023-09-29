@@ -5,6 +5,12 @@
   <!-- Include Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <style>
+    /* CSS to initially hide the button */
+    #fetchDataButton {
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <h1>User Substances</h1>
@@ -22,7 +28,7 @@
   </div>
 
   <!-- Button to fetch and display data for selected substances -->
-  <button onclick="fetchAndDisplayData()">Fetch and Display Data</button>
+  <button id="fetchDataButton" onclick="fetchAndDisplayData()">Fetch and Display Data</button>
   
   <!-- Container for displaying data -->
   <div id="dataDisplay">
@@ -90,6 +96,10 @@
               substanceCheckboxes.appendChild(checkbox);
               substanceCheckboxes.appendChild(label);
             });
+
+            // Show the "Fetch and Display Data" button
+            const fetchDataButton = document.getElementById("fetchDataButton");
+            fetchDataButton.style.display = "block";
           }
         })
         .catch((error) => {
@@ -111,6 +121,10 @@
         alert("Please enter an email.");
         return;
       }
+
+      // Clear existing data
+      const dataDisplay = document.getElementById("dataDisplay");
+      dataDisplay.innerHTML = "";
 
       // Fetch data for selected substances
       const promises = selectedSubstances.map((substance) =>
