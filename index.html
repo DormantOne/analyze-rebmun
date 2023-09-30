@@ -35,7 +35,10 @@
   </style>
 </head>
 <body>
-  <h1>User Substances</h1>
+  <div>
+    <h1>Memory Game Analytics</h1>
+    <button id="returnToGameButton">Return to Game</button>
+  </div>
   
   <!-- Input field to enter user email -->
   <label for="emailInput">Enter Email:</label>
@@ -307,7 +310,12 @@ function generateGraph() {
 
 
 
-
+  document.addEventListener("DOMContentLoaded", function() {
+    const returnToGameButton = document.getElementById("returnToGameButton");
+    returnToGameButton.addEventListener("click", function() {
+      window.location.href = "https://dormantone.github.io/numberecall/";
+    });
+  });
 
 
 
