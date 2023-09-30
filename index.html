@@ -32,13 +32,22 @@
   margin-right: 5px; /* Add some space between charts */
 }
 
+
+/* Add this to your existing CSS */
+.title-container {
+  display: flex;
+  align-items: center;
+}
+
   </style>
 </head>
 <body>
-  <div>
-    <h1>Memory Game Analytics</h1>
-    <button id="returnToGameButton">Return to Game</button>
-  </div>
+<!-- Add the class to the div -->
+<div class="title-container">
+  <h1>Memory Game Analytics</h1>
+  <button id="returnToGameButton">Return to Game</button>
+</div>
+
   
   <!-- Input field to enter user email -->
   <label for="emailInput">Enter Email:</label>
